@@ -285,43 +285,9 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 		dialstep.dialNouns.splice( dialstep.dialNouns.indexOf(noun), 1 );
 	}
 
-	$scope.addStep = function (classAttribute,pos,listmodel) {
-		//console.log("Adding step ");
-		r = RegExp("button-([^ ]+)");
-		m = r.exec( classAttribute );
-		if ( m != null ) {
-			var step;
-			var stepkind = m[1];
-			if (stepkind == "control") {
-                step = {kind: stepkind}
-			} else {
-                step = $injector.invoke([stepkind+'Model', function(model){
-                    var stepname = stepRegistry.name();
-                    return new model(stepname);
-                }]);
-			}
-
-			//console.log("adding step - " + m[1]);
-			$scope.$apply( function ()	{
-				listmodel.splice(pos,0, step);
-			});
-		}
-	}
-
-	$scope.removeStep = function (step,node_steps,steps) {
-		//console.log("Removing step");
-		var container;
-		if ( typeof steps != 'undefined')
-			container = steps;
-		else
-			container = node_steps;
-
-		container.splice( container.indexOf(step), 1);
-	}
-
-    $scope.signalSavePressed = function() {
-        $rootScope.$broadcast("save-project-clicked");
-    }
+  $scope.signalSavePressed = function() {
+      $rootScope.$broadcast("save-project-clicked");
+  }
 
 	function onSavePressed() {
 		var nodes = nodeRegistry.getNodes();

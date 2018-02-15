@@ -1,4 +1,47 @@
 angular.module('Rvd')
+.directive('rvdModule', function ($injector, stepRegistry) {
+  return {
+    restrict: 'E',
+    scope: {
+      module: '='
+    },
+    templateUrl: function(elem, attr) {
+      var url = 'templates/modules/' + attr.kind + 'Module.html';
+      return url;
+    },
+    link: function( scope, element, attrs) {
+      console.log('created module ', scope.module);
+
+      scope.addStep = function (classAttribute,pos,listmodel) { // we don't use listmodel since all this happens inside a specific module scope
+      		console.log("Adding step ");
+      		r = RegExp("button-([^ ]+)");
+      		m = r.exec( classAttribute );
+      		if ( m != null ) {
+      			var step;
+      			var stepkind = m[1];
+      			if (stepkind == "control") {
+                      step = {kind: stepkind}
+      			} else {
+                      step = $injector.invoke([stepkind+'Model', function(model){
+                          var stepname = stepRegistry.name();
+                          return new model(stepname);
+                      }]);
+      			}
+
+      			//console.log("adding step - " + m[1]);
+      			scope.$apply( function ()	{
+      				scope.module.steps.splice(pos,0, step);
+      			});
+      		}
+      	}
+
+      scope.removeStep = function (step,node_steps,steps) { // we don't need list since we know the module
+      		console.log("Removing step");
+      		scope.module.steps.splice( scope.module.steps.indexOf(step), 1);
+      }
+    }
+  }
+})
 .directive('gatherStep', function (gatherModel) {
 	return {
 			restrict: 'A',

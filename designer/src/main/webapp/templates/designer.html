@@ -189,7 +189,9 @@
 						<div class="rvd-node" ng-repeat="nodeSummary in getEditedNodeNames()" ng-show="isNodeActive(nodeSummary.name)">
 
 							<div ng-controller="nodeController">
-								<ng-include src="'templates/modules/' + node.kind + 'Module.html'"></ng-include>
+								<rvd-module ng-if='node.kind=="voice"'  kind="voice" module="node"></rvd-module>
+								<rvd-module ng-if='node.kind=="sms"'  kind="sms" module="node"></rvd-module>
+								<rvd-module ng-if='node.kind=="ussd"'  kind="ussd" module="node"></rvd-module>
 							</div>
 						</div>
 
