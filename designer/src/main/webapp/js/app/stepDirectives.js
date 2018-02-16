@@ -35,10 +35,40 @@ angular.module('Rvd')
       		}
       	}
 
-      scope.removeStep = function (step,node_steps,steps) { // we don't need list since we know the module
+      scope.removeStep = function (step) { // we don't need list since we know the module
       		console.log("Removing step");
       		scope.module.steps.splice( scope.module.steps.indexOf(step), 1);
       }
+    }
+  }
+})
+.directive('playStep', function (bundledWavsCache) {
+  return {
+    restrict: 'E',
+    scope: {
+      step: '=',
+      onRemove: '&'
+    },
+    templateUrl: 'templates/steps/playStep.html',
+    link: function (scope, element, attrs) {
+      console.log("added play step");
+
+      scope.bundledWavs = bundledWavsCache.get();
+
+      scope.selectBundledWav = function(playstep, wavUrl) {
+        playstep.remote.wavUrl = wavUrl;
+      }
+
+      // this method replaces rvdModule:removeStep() so that removal button in stepHeading.html keeps working
+      scope.removeStep = function(step) {// ignore: (step,listModel)
+        scope.onRemove({removedStep: step});
+      }
+
+      scope.$on('project-wav-removed', function (event, data) {
+        if ( data == scope.step.local.wavLocalFilename )
+          scope.step.local.wavLocalFilename = "";
+      });
+
     }
   }
 })

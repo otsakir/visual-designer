@@ -1,5 +1,6 @@
 <div cly-reporter id="voice-modules-listing" basic-sortable list-model="module.steps"  class='steps step-list' item-added='addStep(class, index, list)'>
 	<div class='step' ng-repeat='step in module.steps'>
-		<ng-include src="'templates/steps/' + step.kind + 'Step.html'"></ng-include>
+		<ng-include ng-if="step.kind!=='play'" src="'templates/steps/' + step.kind + 'Step.html'"></ng-include>
+		<play-step ng-if="step.kind==='play'" step="step" on-remove="removeStep(removedStep)"></play-step>
 	</div>
 </div>

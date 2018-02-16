@@ -88,8 +88,8 @@ App.config(['$stateProvider','$urlRouterProvider', '$translateProvider', functio
             project: function(designerService, $stateParams, $state,authorize) {
                 return designerService.openProject($stateParams.applicationSid);
             },
-            bundledWavs: function(designerService,authorize) {
-                return designerService.getBundledWavs();
+            bundledWavs: function(bundledWavsCache,authorize) {
+                return bundledWavsCache.getRefreshed();
             },
             projectParameters: function(parametersResource, $stateParams, authorize) {
                 return parametersResource.get({applicationSid: $stateParams.applicationSid});

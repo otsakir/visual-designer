@@ -273,13 +273,6 @@ angular.module('Rvd').controller('wavManagerController', function ($rootScope, $
 	}
 });
 
-angular.module('Rvd').controller('playStepController', function ($scope) {
-	$scope.$on('project-wav-removed', function (event, data) {
-		if ( data == $scope.step.local.wavLocalFilename )
-			$scope.step.local.wavLocalFilename = "";
-	});
-});
-
 angular.module('Rvd').controller('homeCtrl', function ($scope, RvdConfiguration) {
     $scope.ussdSupport = RvdConfiguration.ussdSupport;
 });

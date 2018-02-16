@@ -142,9 +142,6 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 		}
 		return count;
 	}
-	$scope.selectBundledWav = function(playstep, wavUrl) {
-		playstep.remote.wavUrl = wavUrl;
-	}
 
 
 	$scope.bundledWavs = bundledWavs;
@@ -777,6 +774,7 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 		return deferred.promise;
 	}
 
+/*
 	function getBundledWavs() {
 		var deferred = $q.defer();
 		$http({url: 'services/designer/bundledWavs', method: "GET"})
@@ -787,6 +785,7 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 		 });
 		return deferred.promise;
 	}
+	*/
 
 	function startupNodeSet(project) {
         if ( typeof(nodeRegistry.getNode(project.startNodeName)) !== 'undefined' )
@@ -806,7 +805,6 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 	service.getWavList = getWavList;
 	service.saveProject = saveProject;
 	service.buildProject = buildProject;
-	service.getBundledWavs = getBundledWavs;
 	service.startupNodeSet = startupNodeSet;
     service.getStartUrl = getStartUrl;
 

@@ -415,6 +415,32 @@ angular.module('Rvd').factory('parametersResource', function ($resource) {
   });
 });
 
+angular.module('Rvd').factory('bundledWavsResource', function ($resource) {
+  return $resource('api/designer/bundledWavs');
+});
+
+angular.module('Rvd').factory('bundledWavsCache', function (bundledWavsResource) {
+  var cache;
+
+  function retrieveWavs() {
+    cache = bundledWavsResource.query();
+    return cache;
+  }
+
+  return {
+    get: function() {
+      if (!cache) {
+        return retrieveWavs();
+      } else {
+        return cache;
+      }
+    },
+    getRefreshed: function () {
+      return retrieveWavs();
+    }
+  }
+});
+
 angular.module('Rvd').service('parametersService', function ($q,$modal,parametersResource) {
 	//console.log("Creating webTriggerService");
 	var service = {};

@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
 import org.restcomm.connect.rvd.RvdContext;
 import org.restcomm.connect.rvd.exceptions.ProjectDoesNotExist;
 import org.restcomm.connect.rvd.identity.UserIdentityContext;
@@ -48,7 +49,8 @@ public class DesignerRestService extends SecuredRestService {
     public Response listBundledWavs(@PathParam("name") String name) throws StorageException, ProjectDoesNotExist {
         secure();
         List<WavItem> items = RvdUtils.listBundledWavs(rvdContext);
-        return buildOkResponse(items);
+        Gson gson = new Gson();
+        return Response.ok(gson.toJson(items)).build();
     }
 
 }
