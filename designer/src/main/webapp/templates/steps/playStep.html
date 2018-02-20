@@ -18,7 +18,7 @@
 							<span title="{{'playStepUrlFileBundleUrlTitle' | translate}}">{{'playStepUrlFileBundleUrlRadio' | translate}} &nbsp;</span>
 							<input ng-model='step.playType' value='remote' type="radio">
 						</span>
-						<select name='wavLocalFilename' ng-show='step.playType=="local"' ng-model='step.local.wavLocalFilename' ng-options='wavItem.filename as wavItem.filename for wavItem in project.wavList' class="form-control" required></select>
+						<select name='wavLocalFilename' ng-show='step.playType=="local"' ng-model='step.local.wavLocalFilename' ng-options='wavItem.filename as wavItem.filename for wavItem in getProjectWavs()' class="form-control" required></select>
 
 						<!--
 						<input  name='wavUrl' ng-show='step.playType=="remote"' null-if-empty ng-model='step.remote.wavUrl' lookup-target type='text' required class='form-control' placeholder="{{'playStepUrlFileInputPlaceholder' | translate}}"/>

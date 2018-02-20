@@ -1,4 +1,4 @@
-<div gather-step class="step step-gather panel panel-default step-{{step.name}}">
+<div gather-step class="step step-gather panel panel-default step-{{step.name}}" on-remove="removeStep(removedStep)">
 	<div class="panel-heading">
 		<step-heading></step-heading>		</div>
 	<div class="panel-body" ng-hide='step.iface.isCollapsed'>
@@ -8,7 +8,7 @@
 				<p>{{'gatherStepDescriptionLabel1' | translate}} <em>{{'gatherStepDescriptionLabel2' | translate}}</em> {{'gatherStepDescriptionLabel3' | translate}}</p>
 				<small>
 					<!-- <div class='sortable-steps nested' sortable-steps> -->
-					<div cly-reporter id="gather-nested-listing" basic-sortable  list-model="step.steps" class='steps nested-steps' item-added='addStep'>
+					<div cly-reporter id="gather-nested-listing" basic-sortable  list-model="step.steps" class='steps nested-steps' item-added='addNestedStep(class, index, list)'>
 						<div class='step' ng-repeat='step in step.steps'>
 							<div ng-switch on="step.kind">
 								<div ng-switch-when="say">

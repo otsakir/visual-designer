@@ -441,6 +441,39 @@ angular.module('Rvd').factory('bundledWavsCache', function (bundledWavsResource)
   }
 });
 
+angular.module('Rvd').factory('projectWavsResource', function ($resource) {
+  return $resource('api/projects/:applicationSid/wavs', {}, {
+  });
+});
+
+angular.module('Rvd').factory('projectWavsCache', function (projectWavsResource) {
+  var cache;
+  var appSid; // application whose wavs are in cache (maybe we don't really need to store it)
+
+
+  function retrieveWavs(applicationSid) {
+    cache = projectWavsResource.query({applicationSid: applicationSid});
+    appSid = applicationSid;
+    return cache;
+  }
+
+  // public interface
+  return {
+    get: function() {
+      if (!cache) {
+        throw "projectWavsCache not initialized";
+      } else {
+        return cache;
+      }
+    },
+    getRefreshed: function (applicationSid) {
+      return retrieveWavs(applicationSid);
+    }
+  }
+});
+
+
+
 angular.module('Rvd').service('parametersService', function ($q,$modal,parametersResource) {
 	//console.log("Creating webTriggerService");
 	var service = {};

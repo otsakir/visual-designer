@@ -87,7 +87,7 @@
 							<a class='rvd-clickable' ng-show='!showAudioResources' ng-click='showAudioResources = true'>{{'designerMoreLabel' | translate}}</a>
 						</div>
 						<div ng-show='showAudioResources'>
-							<div class='row' ng-repeat='wavItem in project.wavList'>
+							<div class='row' ng-repeat='wavItem in wavList'>
 								<div ng-show='!wavItem.viewMode'>
 									<div class='col-md-10 ellipsis' tooltip='{{wavItem.filename}}' tooltip-popup-delay="1000" tooltip-trigger="mouseenter">{{wavItem.filename}}</div>
 									<div class='col-md-1'>

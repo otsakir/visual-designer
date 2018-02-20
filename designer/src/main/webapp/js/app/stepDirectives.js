@@ -42,7 +42,7 @@ angular.module('Rvd')
     }
   }
 })
-.directive('playStep', function (bundledWavsCache) {
+.directive('playStep', function (bundledWavsCache, projectWavsCache) {
   return {
     restrict: 'E',
     scope: {
@@ -69,20 +69,50 @@ angular.module('Rvd')
           scope.step.local.wavLocalFilename = "";
       });
 
+      scope.getProjectWavs = function () {
+        return projectWavsCache.get();
+      }
+
     }
   }
 })
-.directive('gatherStep', function (gatherModel) {
+.directive('gatherStep', function (gatherModel, $injector, stepRegistry) {
 	return {
 			restrict: 'A',
 			link: function (scope, element, attrs) {
 				if (scope.step) {
 					//gatherModel.validate(scope.step);
 				}
-				else
+				else {
 					scope.step = new gatherModel();
-				
-				
+			  }
+
+        scope.addNestedStep = function (classAttribute,pos,listmodel) { // we don't use listmodel since all this happens inside a specific module scope
+      		r = RegExp("button-([^ ]+)");
+      		m = r.exec( classAttribute );
+      		if ( m != null ) {
+      			var step;
+      			var stepkind = m[1];
+      			if (stepkind == "control") {
+                      step = {kind: stepkind}
+      			} else {
+                      step = $injector.invoke([stepkind+'Model', function(model){
+                          var stepname = stepRegistry.name();
+                          return new model(stepname);
+                      }]);
+      			}
+
+      			scope.$apply( function ()	{
+      				listmodel.splice(pos,0, step);
+      			});
+      		}
+      	}
+
+        scope.removeStep = function (step) { // we don't need list since we know the module
+            console.log("Removing step");
+            step.steps.splice( step.steps.indexOf(step), 1);
+        }
+
 				function getEffectiveValidationType(validation) {
 					if ( validation.userPattern != undefined )
 						return "One of";
@@ -398,6 +428,36 @@ angular.module('Rvd')
     }
 })
 ;
+
+// not yet a full-fledged dial directive but will soon become one
+angular.module('Rvd').directive('dialStep', function ($injector) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      scope.addDialNoun = function (classAttribute, pos, listmodel) {
+        // console.log("adding dial noun");
+        r = RegExp("dial-noun-([^ ]+)");
+        m = r.exec( classAttribute );
+        if ( m != null ) {
+          // console.log("adding dial noun - " + m[1]);
+          var noun = $injector.invoke([m[1]+'NounModel', function(model){
+            return new model();
+          }]);
+          scope.$apply( function ()	{
+            listmodel.splice(pos,0, noun);
+          });
+        }
+      }
+
+      scope.removeDialNoun = function (dialstep,noun) {
+        dialstep.dialNouns.splice( dialstep.dialNouns.indexOf(noun), 1 );
+      }
+    }
+
+  }
+});
+
+
 
 angular.module('Rvd').directive('conferenceDialNoun', function (RvdConfiguration) {
     return {

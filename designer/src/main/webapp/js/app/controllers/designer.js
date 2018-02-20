@@ -1,4 +1,4 @@
-var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $q, $stateParams, $location, stepService, $http, $timeout, $injector, stepRegistry, stepPacker, $modal, notifications, ModelBuilder, projectSettingsService, webTriggerService, nodeRegistry, editedNodes, project, designerService, $filter, $anchorScroll, bundledWavs, fileRetriever, RvdConfiguration, versionChecker, projectParameters, parametersService, applicationsResource, authentication, application) {
+var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $q, $stateParams, $location, stepService, $http, $timeout, $injector, stepRegistry, stepPacker, $modal, notifications, ModelBuilder, projectSettingsService, webTriggerService, nodeRegistry, editedNodes, project, designerService, $filter, $anchorScroll, bundledWavs, fileRetriever, RvdConfiguration, versionChecker, projectParameters, parametersService, applicationsResource, authentication, application, projectWavsCache ) {
 
 	$scope.project = project;
 	$scope.visibleNodes = editedNodes.getEditedNodes();
@@ -13,6 +13,8 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 	        notifications.put({type:"danger", message:"Error downloading project archive"});
 	    });
 	}
+
+	$scope.wavList = projectWavsCache.getRefreshed($stateParams.applicationSid);
 
   $scope.startupNodeSet = function () {
       return designerService.startupNodeSet(project);
@@ -198,13 +200,6 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 	$scope.projectError = null; // SET when opening a project fails
 	$scope.applicationSid = $stateParams.applicationSid;
 
-	//$scope.nodes = [];
-	//$scope.activeNode = 0 	// contains the currently active node for all kinds
-							// of nodes
-	//$scope.lastNodesId = 0	// id generators for all kinds of nodes
-
-	$scope.wavList = [];
-
 	// Some constants to be moved elsewhere = TODO
 	$scope.yesNoBooleanOptions = [{caption:"Yes", value:true}, {caption:"No", value:false}];
 	$scope.nullValue = null;
@@ -240,14 +235,6 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 		});
 	});
 
-
-	$scope.refreshWavList = function() {
-		designerService.getWavList($scope.applicationSid).then(function (wavList) {
-			$scope.project.wavList = wavList;
-		});
-
-	}
-
 	$scope.addAssignment = function(step) {
 		console.log("adding assignment");
 		step.assignments.push({moduleNameScope: null, destVariable:'', scope:'module', valueExtractor: {accessOperations:[], lastOperation: angular.copy(protos.accessOperationProtos.object)} });
@@ -263,24 +250,6 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 		step.urlParams.splice( step.urlParams.indexOf(urlParam), 1 );
 	}
 
-	$scope.addDialNoun = function (classAttribute, pos, listmodel) {
-		// console.log("adding dial noun");
-		r = RegExp("dial-noun-([^ ]+)");
-		m = r.exec( classAttribute );
-		if ( m != null ) {
-			// console.log("adding dial noun - " + m[1]);
-			var noun = $injector.invoke([m[1]+'NounModel', function(model){
-				return new model();
-			}]);
-			$scope.$apply( function ()	{
-				listmodel.splice(pos,0, noun);
-			});
-		}
-	}
-
-	$scope.removeDialNoun = function (dialstep,noun) {
-		dialstep.dialNouns.splice( dialstep.dialNouns.indexOf(noun), 1 );
-	}
 
   $scope.signalSavePressed = function() {
       $rootScope.$broadcast("save-project-clicked");
@@ -338,13 +307,13 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 		// .then( function () { console.log('project saved and built')});
 	}
 
-    $scope.$on('mediafile-uploaded', function(event, data) {
-        $scope.refreshWavList();
-        $scope.showAudioResources = true;
-    });
-    // handle messages sent from main menu
+  $scope.$on('mediafile-uploaded', function(event, data) {
+    $scope.wavList = projectWavsCache.getRefreshed($stateParams.applicationSid);
+    $scope.showAudioResources = true;
+  });
+  // handle messages sent from main menu
 	$scope.$on('project-wav-removed', function (event,data) {
-		$scope.refreshWavList();
+		$scope.wavList = projectWavsCache.getRefreshed($stateParams.applicationSid);
 	});
 	$scope.$on('save-project-clicked', function (event,data) {
 	    onSavePressed();
@@ -635,9 +604,10 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 
 });
 
-angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http', 'stepPacker', 'ModelBuilder', 'nodeRegistry', 'editedNodes', function (stepRegistry, $q, $http, stepPacker, ModelBuilder, nodeRegistry, editedNodes) {
+angular.module('Rvd').service('designerService', function (stepRegistry, $q, $http, stepPacker, ModelBuilder, nodeRegistry, editedNodes, projectWavsCache) {
 	var service = {};
 
+  // here you can include operations that should occur after the project has been loaded
 	function openProject(name) {
 		var deferred = $q.defer();
 
@@ -652,16 +622,7 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 			var project = {};
 			project.projectName = name;
 			unpackState(project, data);
-			if ( project.projectKind == 'voice' ) {
-				getWavList(name).then(function (wavList) {
-					project.wavList = wavList;
-					deferred.resolve(project);
-				}, function (error) {
-					deferred.reject(error);
-				});
-			} else {
-				deferred.resolve(project);
-			}
+			deferred.resolve(project);
 			editedNodes.addEditedNode(project.startNodeName); // add a module tab
 			editedNodes.setActiveNode(project.startNodeName); // give focus to this tab
 
@@ -727,19 +688,6 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 		return state;
 	}
 
-	function getWavList(applicationSid) {
-		var deferred = $q.defer();
-		$http({url: 'services/projects/'+ applicationSid + '/wavs' , method: "GET"})
-		.success(function (data, status, headers, config) {
-			//$scope.wavList = data;
-			deferred.resolve(data);
-		})
-		.error(function (data, status, headers, config) {
-			deferred.reject("wav-error");
-		});
-		return deferred.promise;
-	}
-
 	function saveProject(applicationSid,project) {
 		var deferred = $q.defer();
 
@@ -774,19 +722,6 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 		return deferred.promise;
 	}
 
-/*
-	function getBundledWavs() {
-		var deferred = $q.defer();
-		$http({url: 'services/designer/bundledWavs', method: "GET"})
-		.success(function (data, status, headers, config) {
-			deferred.resolve(data.payload);
-		 }).error(function (data, status, headers, config) {
-			 deferred.reject('Error fetching designer bundled wavs');
-		 });
-		return deferred.promise;
-	}
-	*/
-
 	function startupNodeSet(project) {
         if ( typeof(nodeRegistry.getNode(project.startNodeName)) !== 'undefined' )
             return true;
@@ -802,7 +737,6 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
     }
 
 	service.openProject = openProject;
-	service.getWavList = getWavList;
 	service.saveProject = saveProject;
 	service.buildProject = buildProject;
 	service.startupNodeSet = startupNodeSet;
@@ -810,7 +744,7 @@ angular.module('Rvd').service('designerService', ['stepRegistry', '$q', '$http',
 
 	return service;
 
-}]);
+});
 
 /*
     Contains step management operations for a specific module
