@@ -76,7 +76,7 @@ angular.module('Rvd')
     }
   }
 })
-.directive('gatherStep', function (gatherModel, $injector, stepRegistry) {
+.directive('gatherStep', function (gatherModel, $injector, stepRegistry, nodeRegistry, staticConfiguration) {
 	return {
 			restrict: 'A',
 			link: function (scope, element, attrs) {
@@ -136,6 +136,22 @@ angular.module('Rvd')
 					}
 				}		
 				scope.setValidationTypeRegex = 	setValidationTypeRegex;
+
+        scope.addGatherMapping = function( gatherStep ) {
+          gatherStep.menu.mappings.push({digits:"", next:""});
+        };
+        scope.addSpeechGatherMapping = function( gatherStep ) {
+              gatherStep.menu.speechMappings.push({key:"", next:""});
+        };
+        scope.removeGatherMapping = function (gatherStep, mapping) {
+          gatherStep.menu.mappings.splice( gatherStep.menu.mappings.indexOf(mapping), 1 );
+        }
+        scope.removeSpeechGatherMapping = function (gatherStep, mapping) {
+              gatherStep.menu.speechMappings.splice( gatherStep.menu.speechMappings.indexOf(mapping), 1 );
+        }
+        scope.getAllTargets = nodeRegistry.getNodes;
+        scope.languages = staticConfiguration.languages;
+        scope.languagesGather = staticConfiguration.languagesGather;
 				
 		}
 	}
@@ -426,6 +442,20 @@ angular.module('Rvd')
             scope.getAllTargets = nodeRegistry.getNodes;
         }
     }
+})
+.directive('ussdCollectStep', function (nodeRegistry) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      scope.addUssdCollectMapping = function (collectStep) {
+        collectStep.menu.mappings.push({digits:"", next:""});
+      }
+      scope.removeGatherMapping = function (gatherStep, mapping) {
+        gatherStep.menu.mappings.splice( gatherStep.menu.mappings.indexOf(mapping), 1 );
+      }
+      scope.getAllTargets = nodeRegistry.getNodes;
+    }
+  }
 })
 ;
 

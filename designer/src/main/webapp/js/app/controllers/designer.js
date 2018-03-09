@@ -118,22 +118,7 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 	$scope.nodeNamed = function (name) {
 		return nodeRegistry.getNode(name);
 	}
-	$scope.addGatherMapping = function( gatherStep ) {
-		gatherStep.menu.mappings.push({digits:"", next:""});
-	};
-	$scope.addSpeechGatherMapping = function( gatherStep ) {
-        gatherStep.menu.speechMappings.push({key:"", next:""});
-    };
-	$scope.removeGatherMapping = function (gatherStep, mapping) {
-		gatherStep.menu.mappings.splice( gatherStep.menu.mappings.indexOf(mapping), 1 );
-	}
-	$scope.removeSpeechGatherMapping = function (gatherStep, mapping) {
-        gatherStep.menu.speechMappings.splice( gatherStep.menu.speechMappings.indexOf(mapping), 1 );
-    }
-	// ussd collect handles adding mappings a little differently
-	$scope.addUssdCollectMapping = function (collectStep) {
-		collectStep.menu.mappings.push({digits:"", next:""});
-	}
+
 	// returns the number of conference nounds contained in the dial
 	$scope.dialContainsConference = function (dialstep) {
 		var count = 0;
@@ -153,44 +138,7 @@ var designerCtrl = App.controller('designerCtrl', function($scope, $rootScope, $
 							// parameters
 
 	// Prototype and constant data structures
-	$scope.languages = [
-											{name:'bf',text:'Belgium-French'},
-											{name:'bp',text: 'Brazilian-Portugues'},
-											{name:'en-gb',text: 'British-English'},
-											{name:'cf',text: 'Canadian-French'},
-											{name:'zh-cn',text: 'Chinese'},
-											{name:'zh-hk',text: 'Chinese - Hong Kong'},
-											{name:'zh-tw',text: 'Chinese - Taiwan'},
-											{name:'cs',text: 'Czech'},
-											{name:'dan',text: 'Dannish'},
-											{name:'en',text:'English'},
-											{name:'fi',text: 'Finnish'},
-											{name:'es',text: 'Spanish'},
-											{name:'fr',text: 'French'},
-											{name:'de',text: 'German'},
-											{name:'el',text: 'Greek'},
-											{name:'it',text: 'Italian'},
-											{name:'ja',text: 'Japanese'},
-											{name:'nl',text: 'Netherlands-Dutch'},
-											{name:'no',text: 'Norwegian'},
-											{name:'pl',text: 'Polish'},
-											{name:'pt',text: 'Portuguese'},
-											{name:'ru',text: 'Russian'},
-											{name:'ar',text: 'Saudi-Arabia Arabic'},
-											{name:'ca',text: 'Spain Catalan'},
-											{name:'sv',text: 'Swedish'},
-											{name:'th',text: 'Thai'},
-											{name:'tr',text: 'Turkish'}
-										 ];
-	$scope.languagesGather = [
-		{name:'en-GB',text: 'British-English'},
-		{name:'en-US',text:'English'},
-		{name:'es-ES',text: 'Spanish'},
-		{name:'fr-FR',text: 'French'},
-		{name:'it-IT',text: 'Italian'},
-		{name:'pl-PL',text: 'Polish'},
-		{name:'pt-PT',text: 'Portuguese'}
-	];
+
 	$scope.methods = ['POST', 'GET'];
 
 	$scope.ussdMaxEnglishChars = 182;

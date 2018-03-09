@@ -988,3 +988,47 @@ angular.module('Rvd').factory('versionChecker', function () {
 angular.module('Rvd').factory('applicationsResource', function ($resource) {
   return $resource('/restcomm/2012-04-24/Accounts/:accountId/Applications/:applicationId.json');
 });
+
+
+angular.module('Rvd').factory('staticConfiguration', function () {
+  return {
+    languages: [ // languages for Gather
+      {name:'bf',text:'Belgium-French'},
+      {name:'bp',text: 'Brazilian-Portugues'},
+      {name:'en-gb',text: 'British-English'},
+      {name:'cf',text: 'Canadian-French'},
+      {name:'zh-cn',text: 'Chinese'},
+      {name:'zh-hk',text: 'Chinese - Hong Kong'},
+      {name:'zh-tw',text: 'Chinese - Taiwan'},
+      {name:'cs',text: 'Czech'},
+      {name:'dan',text: 'Dannish'},
+      {name:'en',text:'English'},
+      {name:'fi',text: 'Finnish'},
+      {name:'es',text: 'Spanish'},
+      {name:'fr',text: 'French'},
+      {name:'de',text: 'German'},
+      {name:'el',text: 'Greek'},
+      {name:'it',text: 'Italian'},
+      {name:'ja',text: 'Japanese'},
+      {name:'nl',text: 'Netherlands-Dutch'},
+      {name:'no',text: 'Norwegian'},
+      {name:'pl',text: 'Polish'},
+      {name:'pt',text: 'Portuguese'},
+      {name:'ru',text: 'Russian'},
+      {name:'ar',text: 'Saudi-Arabia Arabic'},
+      {name:'ca',text: 'Spain Catalan'},
+      {name:'sv',text: 'Swedish'},
+      {name:'th',text: 'Thai'},
+      {name:'tr',text: 'Turkish'}
+     ],
+    languagesGather: [ // ASR languages
+     		{name:'en-GB',text: 'British-English'},
+     		{name:'en-US',text:'English'},
+     		{name:'es-ES',text: 'Spanish'},
+     		{name:'fr-FR',text: 'French'},
+     		{name:'it-IT',text: 'Italian'},
+     		{name:'pl-PL',text: 'Polish'},
+     		{name:'pt-PT',text: 'Portuguese'}
+    ]
+  }
+});
