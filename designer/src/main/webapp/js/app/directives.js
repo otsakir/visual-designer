@@ -445,6 +445,22 @@ angular.module('Rvd').directive('validateHints', [function() {
 	}]
 );
 
+angular.module('Rvd').directive('facValidator', function (featureAccessControl, accountProfilesCache) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      console.log("in facValidator:");
+      var profile = accountProfilesCache.get();
+      profile.$promise.then(function () {
+        scope.$watch(attrs['ngModel'], function (newValue) {
+          console.log("validation result: ", featureAccessControl.validateOutboundPSTN(newValue, profile));
+        });
+      });
+    }
+  }
+
+});
+
 
 
 

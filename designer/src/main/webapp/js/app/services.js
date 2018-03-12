@@ -834,6 +834,8 @@ angular.module('Rvd').factory('keepAliveResource', function($resource) {
     return $resource('services/auth/keepalive');
 });
 
+
+
 angular.module('Rvd').factory('fileRetriever', function (Blob, FileSaver, $http) {
     // Returns a promise.
     // resolved: nothing is returned - the file has been saved normally
@@ -928,4 +930,80 @@ angular.module('Rvd').factory('versionChecker', function () {
 
 angular.module('Rvd').factory('applicationsResource', function ($resource) {
   return $resource('/restcomm/2012-04-24/Accounts/:accountId/Applications/:applicationId.json');
+});
+
+// mock service for accountProfiles restcomm API. It should be updated with the real version using $resource
+angular.module('Rvd').factory('accountProfilesResource', function ($resource, $q)  {
+  var response = {
+    featureEnablement: {
+            destinations: {
+            },
+            outboundPSTN: {
+                allowedPrefixes: ["US","Canada"],
+                blockedPrefixes: ["+30"]
+            },
+            inboundPSTN: {
+            },
+            outboundSMS: {
+              allowedPrefixes: ["01","02"],
+              blockedPrefixes: ["+33","+34"]
+            },
+            inboundSMS: {
+            }
+        }
+   }
+  var deferred = $q.defer();
+  deferred.resolve(response);
+  response.$promise = deferred.promise;
+
+  return {
+    get: function () {
+      return response;
+    }
+  }
+});
+
+angular.module('Rvd').factory('accountProfilesCache', function (accountProfilesResource) {
+  var cache;
+
+  function retrieve() {
+    cache = accountProfilesResource.get();
+    return cache;
+  }
+
+  return {
+    get: function() {
+      if (!cache) {
+        return retrieve();
+      } else {
+        return cache;
+      }
+    },
+    getRefreshed: function () {
+      return retrieve();
+    }
+  }
+});
+
+angular.module('Rvd').factory('featureAccessControl', function () {
+  return {
+    validateOutboundPSTN: function (number, profile) {
+        var allowedPrefixes = profile.featureEnablement.outboundPSTN.allowedPrefixes;
+        var blockedPrefixes = profile.featureEnablement.outboundPSTN.blockedPrefixes;
+        if (allowedPrefixes) {
+          for ( var i=0; i< allowedPrefixes.length; i++) {
+            if ( number.startsWith(allowedPrefixes[i]) )
+              return true;
+          }
+        }
+        if (blockedPrefixes) {
+          for (var  i =0; i<blockedPrefixes.length; i++) {
+            if ( number.startsWith(blockedPrefixes[i]) )
+              return false;
+          }
+        }
+        // if it hasn't been blocked so far, assume allowed
+        return true;
+    }
+  }
 });
