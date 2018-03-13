@@ -993,17 +993,17 @@ angular.module('Rvd').factory('featureAccessControl', function () {
         if (allowedPrefixes) {
           for ( var i=0; i< allowedPrefixes.length; i++) {
             if ( number.startsWith(allowedPrefixes[i]) )
-              return true;
+              return;
           }
         }
         if (blockedPrefixes) {
           for (var  i =0; i<blockedPrefixes.length; i++) {
             if ( number.startsWith(blockedPrefixes[i]) )
-              return false;
+              return { status: 'blocked', message: "numbers starting with '" + blockedPrefixes[i] + "' are blocked" };
           }
         }
         // if it hasn't been blocked so far, assume allowed
-        return true;
+        return;
     }
   }
 });
