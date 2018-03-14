@@ -988,23 +988,43 @@ angular.module('Rvd').factory('accountProfilesCache', function (accountProfilesR
 angular.module('Rvd').factory('featureAccessControl', function () {
   return {
     validate: function (number, profile, validator) {
-      if (validator == 'outboundPSTN') {
-        var allowedPrefixes = profile.featureEnablement.outboundPSTN.allowedPrefixes;
-        var blockedPrefixes = profile.featureEnablement.outboundPSTN.blockedPrefixes;
-        if (allowedPrefixes) {
-          for ( var i=0; i< allowedPrefixes.length; i++) {
-            if ( number.startsWith(allowedPrefixes[i]) )
-              return;
+      if (number) {
+        if (validator == 'outboundPSTN') {
+          var allowedPrefixes = profile.featureEnablement.outboundPSTN.allowedPrefixes;
+          var blockedPrefixes = profile.featureEnablement.outboundPSTN.blockedPrefixes;
+          if (allowedPrefixes) {
+            for ( var i=0; i< allowedPrefixes.length; i++) {
+              if ( number.startsWith(allowedPrefixes[i]) )
+                return;
+            }
           }
-        }
-        if (blockedPrefixes) {
-          for (var  i =0; i<blockedPrefixes.length; i++) {
-            if ( number.startsWith(blockedPrefixes[i]) )
-              return { status: 'blocked', message: "numbers starting with '" + blockedPrefixes[i] + "' are blocked" };
+          if (blockedPrefixes) {
+            for (var  i =0; i<blockedPrefixes.length; i++) {
+              if ( number.startsWith(blockedPrefixes[i]) )
+                return { status: 'blocked', message: "numbers starting with '" + blockedPrefixes[i] + "' are blocked" };
+            }
           }
+          // if it hasn't been blocked so far, assume allowed
+          return;
+        } else
+        if (validator == 'outboundSMS') {
+          var allowedPrefixes = profile.featureEnablement.outboundSMS.allowedPrefixes;
+          var blockedPrefixes = profile.featureEnablement.outboundSMS.blockedPrefixes;
+          if (allowedPrefixes) {
+            for ( var i=0; i< allowedPrefixes.length; i++) {
+              if ( number.startsWith(allowedPrefixes[i]) )
+                return;
+            }
+          }
+          if (blockedPrefixes) {
+            for (var  i =0; i<blockedPrefixes.length; i++) {
+              if ( number.startsWith(blockedPrefixes[i]) )
+                return { status: 'blocked', message: "numbers starting with '" + blockedPrefixes[i] + "' are blocked" };
+            }
+          }
+          // if it hasn't been blocked so far, assume allowed
+          return;
         }
-        // if it hasn't been blocked so far, assume allowed
-        return;
       }
     }
   }
