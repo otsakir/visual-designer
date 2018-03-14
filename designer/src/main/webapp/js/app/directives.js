@@ -445,36 +445,18 @@ angular.module('Rvd').directive('validateHints', [function() {
 	}]
 );
 
-/*
-angular.module('Rvd').directive('facValidator', function (featureAccessControl, accountProfilesCache) {
-  return {
-    restrict: 'A',
-    link: function (scope, element, attrs) {
-      console.log("in facValidator:");
-      var profile = accountProfilesCache.get();
-      profile.$promise.then(function () {
-        scope.$watch(attrs['ngModel'], function (newValue) {
-          var validationStatus = featureAccessControl.validateOutboundPSTN(newValue, profile);
-          console.log("validation result: ", validationStatus);
-          scope.facStatus = validationStatus;
-        });
-      });
-    }
-  }
-});
-*/
-
 angular.module('Rvd').directive('facWarning', function (featureAccessControl, accountProfilesCache) {
   return {
     restrict: 'E',
     templateUrl: "templates/directive/facWarning.html",
     link: function (scope, element, attrs) {
-      console.log("in facWarning:");
       var profile = accountProfilesCache.get();
       profile.$promise.then(function () {
         scope.$watch(attrs.monitor, function (newValue) {
-          var validationStatus = featureAccessControl.validateOutboundPSTN(newValue, profile);
-          console.log("validation result: ", validationStatus);
+          var validationStatus = featureAccessControl.validate(newValue, profile, attrs.validator);
+          if (validationStatus && validationStatus.status == 'blocked' && attrs.blockedMessage) {
+            validationStatus.message = attrs.blockedMessage;
+          }
           scope.facWarning = validationStatus; // keep an eye for scope conflicts since we don't have an isolate scope
         });
       });

@@ -32,7 +32,7 @@
 								<span class="input-group-addon rvd-handle"><i class='fa fa-phone'></i></span>
 								<div class="fac-warning-wrap input-group-sm">
 									<input ng-model='dialnoun.destination' lookup-target type='text' class='form-control' ng-class="{'ng-invalid':facWarning.status=='blocked'}" placeholder="{{'dialStepNumberDestinationInputPlaceholder' | translate}}" tooltip="{{'dialStepNumberDestinationInputTooltip' | translate}}">
-									<fac-warning monitor="dialnoun.destination" validator="outboundPSTN"></fac-warning>
+									<fac-warning monitor="dialnoun.destination" validator="outboundPSTN" blocked-message="Your current plan doesn't allow calling the selected destination"></fac-warning>
 								</div>
 								<variable-lookup variable="dialnoun.destination" view="input-group"></variable-lookup>
 

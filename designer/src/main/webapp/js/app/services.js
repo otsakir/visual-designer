@@ -939,14 +939,14 @@ angular.module('Rvd').factory('accountProfilesResource', function ($resource, $q
             destinations: {
             },
             outboundPSTN: {
-                allowedPrefixes: ["US","Canada"],
-                blockedPrefixes: ["+30"]
+                allowedPrefixes: [],
+                blockedPrefixes: []
             },
             inboundPSTN: {
             },
             outboundSMS: {
-              allowedPrefixes: ["01","02"],
-              blockedPrefixes: ["+33","+34"]
+              allowedPrefixes: [],
+              blockedPrefixes: []
             },
             inboundSMS: {
             }
@@ -987,7 +987,8 @@ angular.module('Rvd').factory('accountProfilesCache', function (accountProfilesR
 
 angular.module('Rvd').factory('featureAccessControl', function () {
   return {
-    validateOutboundPSTN: function (number, profile) {
+    validate: function (number, profile, validator) {
+      if (validator == 'outboundPSTN') {
         var allowedPrefixes = profile.featureEnablement.outboundPSTN.allowedPrefixes;
         var blockedPrefixes = profile.featureEnablement.outboundPSTN.blockedPrefixes;
         if (allowedPrefixes) {
@@ -1004,6 +1005,7 @@ angular.module('Rvd').factory('featureAccessControl', function () {
         }
         // if it hasn't been blocked so far, assume allowed
         return;
+      }
     }
   }
 });
