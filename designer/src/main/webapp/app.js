@@ -96,9 +96,6 @@ App.config(['$stateProvider','$urlRouterProvider', '$translateProvider', functio
             },
             application: function (applicationsResource, authentication,$stateParams, authorize) {
                 return applicationsResource.get({applicationId:$stateParams.applicationSid, accountId: authentication.getAccount().sid});
-            },
-            accountProfile: function(accountProfilesCache) {
-                return accountProfilesCache.getRefreshed().$promise; // block on accountProfile retrieval
             }
         }
     });
