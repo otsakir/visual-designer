@@ -19,14 +19,15 @@
 
 package org.restcomm.connect.rvd.http.cors;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 import org.restcomm.connect.rvd.FileRvdConfiguration;
 import org.restcomm.connect.rvd.configuration.RvdConfig;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class CorsFilter implements ContainerResponseFilter {
         allowedOrigins = rvdConfig.getAllowedCorsOrigins();
     }
 
+    /*
     @Override
     public ContainerResponse filter(ContainerRequest cres, ContainerResponse response) {
         String requestOrigin = cres.getHeaderValue("Origin");
@@ -66,5 +68,23 @@ public class CorsFilter implements ContainerResponseFilter {
         }
         return response;
 
+    }
+    */
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        String requestOrigin = requestContext.getHeaderString("Origin");
+        if (requestOrigin != null) { // is this is a cors request (ajax request that targets a different domain than the one the page was loaded from)
+            if (allowedOrigins != null && !allowedOrigins.isEmpty()) {  // no cors restriction apply of allowedOrigins == null
+                if (allowedOrigins.contains(requestOrigin) || allowedOrigins.contains("*")) {
+                    // only return the origin the client informed
+                    responseContext.getStringHeaders().add("Access-Control-Allow-Origin", requestOrigin);
+                    responseContext.getStringHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
+                    responseContext.getStringHeaders().add("Access-Control-Allow-Credentials", "true");
+                    responseContext.getStringHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+                    responseContext.getStringHeaders().add("Access-Control-Max-Age", "1209600");
+                }
+            }
+        }
     }
 }

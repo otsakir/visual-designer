@@ -1,13 +1,14 @@
 package org.restcomm.connect.rvd;
 
-import com.sun.jersey.api.client.Client;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 public class RestTesterClient {
     private static RestTesterClient instance;
     private Client client;
     
     private RestTesterClient() {
-        client = Client.create();
+        client = ClientBuilder.newClient();
     };
     
     public static RestTesterClient getInstance() {

@@ -1,6 +1,6 @@
 package org.restcomm.connect.rvd.model.steps;
 
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
+//import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 import org.mockito.Mockito;
 import org.restcomm.connect.rvd.ApplicationContext;
 import org.restcomm.connect.rvd.ApplicationContextBuilder;
@@ -15,6 +15,7 @@ import org.restcomm.connect.rvd.storage.ProjectDao;
 import org.restcomm.connect.rvd.storage.exceptions.StorageException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,7 +54,7 @@ public class StepTestBase {
      */
     protected MultivaluedMap<String,String> appendMultivaluedMap(MultivaluedMap<String,String> map, String key, String value) {
         if (map == null )
-            map = new StringKeyIgnoreCaseMultivaluedMap<String>();
+            map = new MultivaluedHashMap<String,String>(); //TODO does this have to be case insensitive like com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap ?I think not.
         if ( key != null )
             map.put(key, Arrays.asList(value));
         return map;

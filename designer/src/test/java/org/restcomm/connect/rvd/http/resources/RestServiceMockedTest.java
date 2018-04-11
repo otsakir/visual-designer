@@ -21,7 +21,8 @@
 package org.restcomm.connect.rvd.http.resources;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.sun.jersey.core.util.Base64;
+import org.apache.commons.codec.binary.Base64;
+//import com.sun.jersey.core.util.Base64;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.restcomm.connect.rvd.ApplicationContext;
@@ -109,7 +110,7 @@ public class RestServiceMockedTest {
     }
 
     protected UserIdentityContext signIn(String username, String authToken) {
-        String authorizationHeader = "Basic " + new String(Base64.encode(username + ":" + authToken));
+        String authorizationHeader = "Basic " + new String(Base64.encodeBase64((username + ":" + authToken).getBytes()));
         return new UserIdentityContext(authorizationHeader, accountProvider);
     }
 
