@@ -20,10 +20,8 @@
 
 package org.restcomm.connect.rvd;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientResponse;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -33,6 +31,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -56,9 +57,9 @@ public class NotificationRestServiceTest extends RestServiceTest {
                     .withBody("[{\"sid\": \"AP0a9168dbd9a7402cbb9c99ac434ed817\",\"date_created\": \"Mon, 21 Mar 2016 15:21:04 +0000\",\"date_updated\": \"Sat, 30 Apr 2016 13:43:43 +0000\",\"friendly_name\": \"sms1\",\"account_sid\": \"AC54b41ed43f543e9ca3c8da489b0c1631\",\"api_version\": \"2012-04-24\",\"voice_caller_id_lookup\": false,\"uri\": \"/restcomm/2012-04-24/Accounts/AC54b41ed43f543e9ca3c8da489b0c1631/Applications/AP0a9168dbd9a7402cbb9c99ac434ed817.json\",\"rcml_url\": \"/restcomm-rvd/services/apps/AP0a9168dbd9a7402cbb9c99ac434ed817/controller\",\"kind\": \"sms\"},{\"sid\": \"AP1745d5278c8543c28e29762ea982653d\",\"date_created\": \"Mon, 14 Nov 2016 08:06:53 +0000\",\"date_updated\": \"Mon, 14 Nov 2016 08:06:53 +0000\",\"friendly_name\": \"orestis_TEST\",\"account_sid\": \"AC54b41ed43f543e9ca3c8da489b0c1631\",\"api_version\": \"2012-04-24\",\"voice_caller_id_lookup\": false,\"uri\": \"/restcomm/2012-04-24/Accounts/AC54b41ed43f543e9ca3c8da489b0c1631/Applications/AP1745d5278c8543c28e29762ea982653d.json\",\"rcml_url\": \"/restcomm-rvd/services/apps/AP1745d5278c8543c28e29762ea982653d/controller\",\"kind\": \"voice\"}]")));
 
         Client jersey = getClient("administrator@company.com", "RestComm");
-        WebResource resource = jersey.resource( getResourceUrl("/services/notifications") );
+        WebTarget target = jersey.target( getResourceUrl("/services/notifications") );
         String body = "[{\"type\":\"accountClosed\",\"accountSid\":\"ACae6e420f425248d6a26948c17a9e2acf\"}]";
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class,body);
+        ClientResponse response = target.request().post(Entity.entity(body, MediaType.APPLICATION_JSON_TYPE), ClientResponse.class);
         // first time we shoud get a 200
         Assert.assertEquals(200, response.getStatus());
         verify(1, getRequestedFor(urlEqualTo("/restcomm/2012-04-24/Accounts/ACae6e420f425248d6a26948c17a9e2acf/Applications.json")));

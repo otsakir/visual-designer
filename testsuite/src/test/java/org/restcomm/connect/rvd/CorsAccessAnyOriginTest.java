@@ -1,10 +1,8 @@
 package org.restcomm.connect.rvd;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientResponse;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -14,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.restcomm.connect.commons.Version;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -101,13 +101,13 @@ public class CorsAccessAnyOriginTest extends RestServiceTest {
         // from rvd.xml: <origin>*</origin>
         Client jersey = getClient(username, password);
 
-        WebResource resource = jersey.resource(getResourceUrl("/services/projects"));
-        ClientResponse response = resource.header("Origin", "http://host.restcomm.com").options(ClientResponse.class);
+        WebTarget target = jersey.target(getResourceUrl("/services/projects"));
+        ClientResponse response = target.request().header("Origin", "http://host.restcomm.com").options(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("http://host.restcomm.com",response.getHeaders().getFirst("Access-Control-Allow-Origin"));
 
-        resource = jersey.resource(getResourceUrl("/services/projects"));
-        response = resource.header("Origin", "http://otherhost.restcomm.com").options(ClientResponse.class);
+        target = jersey.target(getResourceUrl("/services/projects"));
+        response = target.request().header("Origin", "http://otherhost.restcomm.com").options(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("http://otherhost.restcomm.com", response.getHeaders().getFirst("Access-Control-Allow-Origin"));
     }

@@ -21,13 +21,15 @@
 package org.restcomm.connect.rvd;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.restcomm.connect.rvd.http.JaxrsBasicAuthenticator;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 import java.net.URL;
 
@@ -67,9 +69,9 @@ public class RestServiceTest {
     public WireMockRule wireMockRule = new WireMockRule(8089);
 
     protected Client getClient(String username, String password) {
-        Client jersey = Client.create();
+        Client jersey = ClientBuilder.newClient();
         if (username != null)
-            jersey.addFilter(new HTTPBasicAuthFilter(username, password));
+            jersey.register(new JaxrsBasicAuthenticator(username, password));
         return jersey;
     }
 

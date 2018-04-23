@@ -21,10 +21,8 @@
 package org.restcomm.connect.rvd;
 
 import com.google.gson.*;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientResponse;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -33,6 +31,9 @@ import org.jboss.shrinkwrap.resolver.api.maven.archive.ShrinkWrapMaven;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.restcomm.connect.commons.Version;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -54,11 +55,11 @@ public class ProjectRestServiceTest extends RestServiceTest {
     @Ignore // retrieving project list is no longer supported
     public void canRetrieveProjects() {
         Client jersey = getClient(username, password);
-        WebResource resource = jersey.resource( getResourceUrl("/services/projects") );
-        ClientResponse response = resource.get(ClientResponse.class);
+        WebTarget target = jersey.target( getResourceUrl("/services/projects") );
+        ClientResponse response = target.request().get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         JsonParser parser = new JsonParser();
         JsonArray array = parser.parse(json).getAsJsonArray();
         Assert.assertTrue("Invalid number of project returned", array.size() >= 3);
@@ -86,14 +87,14 @@ public class ProjectRestServiceTest extends RestServiceTest {
                         .withBody("{\"sid\":\"AP03d28db981ee4aa0888ebebd35b4dd4f\",\"friendly_name\":\"newapplication\"}")));
 
         Client jersey = getClient(username, password);
-        WebResource resource = jersey.resource( getResourceUrl("/services/projects?name=newapplication&kind=voice") );
-        ClientResponse response = resource.post(ClientResponse.class);
+        WebTarget target = jersey.target( getResourceUrl("/services/projects?name=newapplication&kind=voice") );
+        ClientResponse response = target.request().post(null, ClientResponse.class);
         // Also test old contract (PUT ...)
         //WebResource resource = jersey.resource( getResourceUrl("/services/projects/newapplication?kind=voice") );
         //ClientResponse response = resource.put(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(200, response.getStatus());
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         JsonParser parser = new JsonParser();
         JsonObject object = parser.parse(json).getAsJsonObject();
         Assert.assertEquals("Invalid project friendly name", "newapplication", object.get("name").getAsString());
@@ -106,12 +107,12 @@ public class ProjectRestServiceTest extends RestServiceTest {
     @Test
     public void settingsGetting() {
         Client jersey = getClient(username, password);
-        WebResource resource = jersey.resource( getResourceUrl("/services/projects/AP81cf45088cba4abcac1261385916d582/settings") );
+        WebTarget target = jersey.target( getResourceUrl("/services/projects/AP81cf45088cba4abcac1261385916d582/settings") );
         // getting settings should return {} if they are not set
-        ClientResponse response = resource.get(ClientResponse.class);
+        ClientResponse response = target.request().get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         JsonParser parser = new JsonParser();
         Assert.assertTrue("should get an empty object {} when retrieving non-defined settings", parser.parse(json).isJsonObject());
     }

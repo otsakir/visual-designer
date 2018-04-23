@@ -1,12 +1,9 @@
 package org.restcomm.connect.rvd;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientResponse;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -16,6 +13,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.restcomm.connect.commons.Version;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 
 /**
  * @author otsakir@gmail.com - Orestis Tsakiridis
@@ -32,11 +32,11 @@ public class TemplatesRestServiceTest extends RestServiceTest {
     @Test
     public void getSingleTemplate() {
         Client jersey = getClient(username, password);
-        WebResource resource = jersey.resource( getResourceUrl("/api/templates/TL1234") );
-        ClientResponse response = resource.get(ClientResponse.class);
+        WebTarget target = jersey.target( getResourceUrl("/api/templates/TL1234") );
+        ClientResponse response = target.request().get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         Assert.assertTrue(json.contains("TL1234"));
         JsonParser parser = new JsonParser();
         Assert.assertTrue(parser.parse(json).isJsonObject());
@@ -45,11 +45,11 @@ public class TemplatesRestServiceTest extends RestServiceTest {
     @Test
     public void getTemplateList() {
         Client jersey = getClient(username, password);
-        WebResource resource = jersey.resource( getResourceUrl("/api/templates") );
-        ClientResponse response = resource.get(ClientResponse.class);
+        WebTarget resource = jersey.target( getResourceUrl("/api/templates") );
+        ClientResponse response = resource.request().get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         JsonParser parser = new JsonParser();
         JsonElement root = parser.parse(json);
         Assert.assertTrue(root.isJsonObject());

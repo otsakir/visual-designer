@@ -1,10 +1,8 @@
 package org.restcomm.connect.rvd;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientResponse;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -13,6 +11,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.archive.ShrinkWrapMaven;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -100,15 +100,15 @@ public class CorsAccessSingleOriginTest extends RestServiceTest {
         // from rvd.xml: <origin>http://host.restcomm.com</origin>
         Client jersey = getClient(username, password);
         // make a preflight OPTIONS request using an origin present in rvd.xml i.e. http://host.restcomm.com
-        WebResource resource = jersey.resource(getResourceUrl("/services/projects"));
-        ClientResponse response = resource.header("Origin", "http://host.restcomm.com").options(ClientResponse.class);
+        WebTarget target = jersey.target(getResourceUrl("/services/projects"));
+        ClientResponse response = target.request().header("Origin", "http://host.restcomm.com").options(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         MultivaluedMap<String,String> headers = response.getHeaders();
         String originHeader = headers.getFirst("Access-Control-Allow-Origin");
         Assert.assertEquals("http://host.restcomm.com",originHeader);
         // make a preflight OPTIONS request using an origin NOT present in rvd.xml i.e. http://otherhost.restcomm.com
-        WebResource resource2 = jersey.resource(getResourceUrl("/services/projects"));
-        ClientResponse response2 = resource2.header("Origin", "http://otherhost.restcomm.com").options(ClientResponse.class);
+        WebTarget target2 = jersey.target(getResourceUrl("/services/projects"));
+        ClientResponse response2 = target2.request().header("Origin", "http://otherhost.restcomm.com").options(ClientResponse.class);
         originHeader = response2.getHeaders().getFirst("Access-Control-Allow-Origin");
         Assert.assertEquals(200, response2.getStatus());
         Assert.assertNull(originHeader);
