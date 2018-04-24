@@ -10,9 +10,9 @@
 
 	<servlet>
 		<servlet-name>RVD Services</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		
-		<!-- automatic package scanning for some reason does not work with Jersey 
+		<!-- automatic package scanning for some reasoCorsn does not work with Jersey
 			in JBoss -->
 		<!-- <init-param> <param-name>com.sun.jersey.config.property.packages</param-name> 
 			<param-value>org.restcomm.connect.rvd</param-value> </init-param> -->
@@ -26,7 +26,7 @@
 
 		<!-- Enable CORS request filter (allows all cors requests) -->
 		<init-param>
-			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+			<param-name>javax.ws.rs.container.ContainerResponseFilters</param-name>
 			<param-value>org.restcomm.connect.rvd.http.cors.CorsFilter</param-value>
 		</init-param>
 
